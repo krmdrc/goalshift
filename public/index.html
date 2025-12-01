@@ -1,275 +1,241 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
-<head>
-  <meta charset="UTF-8" />
-  <title>GoalShift – Günün Tek Tahmini</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    :root {
-      color-scheme: dark;
-    }
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #111827, #020617);
-      color: #e5e7eb;
-    }
-    .card {
-      width: 100%;
-      max-width: 420px;
-      padding: 28px 24px 24px;
-      border-radius: 18px;
-      background: rgba(15,23,42,0.92);
-      box-shadow: 0 24px 80px rgba(15,23,42,0.8);
-      border: 1px solid rgba(148,163,184,0.25);
-    }
-    .logo {
-      font-weight: 700;
-      font-size: 20px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: #22c55e;
-      margin-bottom: 4px;
-    }
-    .subtitle {
-      font-size: 13px;
-      color: #9ca3af;
-      margin-bottom: 24px;
-    }
-    .section-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #f9fafb;
-      margin-bottom: 8px;
-    }
-    .section-help {
-      font-size: 12px;
-      color: #9ca3af;
-      margin-bottom: 14px;
-    }
-    .prediction-box {
-      border-radius: 12px;
-      padding: 14px 12px;
-      background: rgba(15,118,110,0.16);
-      border: 1px solid rgba(45,212,191,0.4);
-      margin-bottom: 18px;
-    }
-    .prediction-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #67e8f9;
-      margin-bottom: 4px;
-    }
-    .prediction-main {
-      font-size: 15px;
-      font-weight: 600;
-      color: #e5e7eb;
-      margin-bottom: 4px;
-    }
-    .prediction-meta {
-      font-size: 12px;
-      color: #9ca3af;
-    }
-    button {
-      width: 100%;
-      border: none;
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: transform 0.08s ease, box-shadow 0.12s ease, background 0.12s ease;
-    }
-    button:active {
-      transform: scale(0.98);
-    }
-    .btn-google {
-      background: #f9fafb;
-      color: #111827;
-      box-shadow: 0 10px 30px rgba(15,23,42,0.6);
-      margin-bottom: 8px;
-    }
-    .btn-google span.icon {
-      font-size: 16px;
-    }
-    .btn-logout {
-      margin-top: 8px;
-      background: transparent;
-      color: #9ca3af;
-      border: 1px solid rgba(148,163,184,0.4);
-      font-size: 12px;
-      padding: 7px 10px;
-      box-shadow: none;
-    }
-    .user-info {
-      margin-top: 10px;
-      font-size: 12px;
-      color: #9ca3af;
-    }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border-radius: 999px;
-      padding: 4px 8px;
-      font-size: 10px;
-      background: rgba(37,99,235,0.18);
-      color: #bfdbfe;
-      margin-bottom: 10px;
-    }
-    .footer-note {
-      margin-top: 14px;
-      font-size: 11px;
-      color: #6b7280;
-      text-align: center;
-    }
-    .divider {
-      height: 1px;
-      background: radial-gradient(circle, rgba(148,163,184,0.35), transparent);
-      margin: 18px 0 12px;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <div class="logo">GoalShift</div>
-    <div class="subtitle">Günde tek maç. İstatistiğe dayalı tek tahmin.</div>
-
-    <div class="badge">
-      <span>📊</span>
-      <span id="session-status">Giriş yapmadın</span>
-    </div>
-
-    <div class="section-title">Bugünün tahmini</div>
-    <div class="section-help" id="prediction-help">
-      Önce Google ile giriş yap, sonra bugünün tek tahminini burada göreceksin.
-    </div>
-
-    <div class="prediction-box" id="prediction-box" style="display:none;">
-      <div class="prediction-label">Bugünün seçimi</div>
-      <div class="prediction-main" id="prediction-main">
-        Maç bilgisi yükleniyor...
+  <head>
+    <meta charset="utf-8" />
+    <title>GoalShift – Günde tek maç, istatistiğe dayalı tek tahmin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: radial-gradient(circle at top, #101827, #020617 60%);
+        color: #e5e7eb;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .card {
+        width: 100%;
+        max-width: 480px;
+        background: rgba(15, 23, 42, 0.96);
+        border-radius: 24px;
+        padding: 28px 24px 24px;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(55, 65, 81, 0.7);
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: rgba(22, 163, 74, 0.14);
+        color: #bbf7d0;
+        border: 1px solid rgba(34, 197, 94, 0.35);
+        margin-bottom: 14px;
+      }
+      .logo {
+        font-weight: 800;
+        font-size: 24px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .logo span {
+        color: #22c55e;
+      }
+      .subtitle {
+        font-size: 13px;
+        color: #9ca3af;
+        margin-bottom: 24px;
+      }
+      .section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #e5e7eb;
+        margin-bottom: 6px;
+      }
+      .section-text {
+        font-size: 13px;
+        color: #9ca3af;
+        margin-bottom: 16px;
+      }
+      .btn {
+        width: 100%;
+        border: none;
+        border-radius: 999px;
+        padding: 11px 18px;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        background: linear-gradient(90deg, #22c55e, #16a34a);
+        color: #022c22;
+        box-shadow: 0 18px 40px rgba(22, 163, 74, 0.45);
+        transition: transform 0.08s ease, box-shadow 0.08s ease,
+          filter 0.08s ease;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.05);
+        box-shadow: 0 22px 55px rgba(34, 197, 94, 0.5);
+      }
+      .btn:active {
+        transform: translateY(0);
+        box-shadow: 0 10px 25px rgba(22, 163, 74, 0.4);
+      }
+      .btn-lock {
+        font-size: 12px;
+      }
+      .status {
+        margin-top: 16px;
+        font-size: 12px;
+        color: #9ca3af;
+      }
+      .status span {
+        color: #a5b4fc;
+      }
+      .footnote {
+        margin-top: 20px;
+        font-size: 11px;
+        color: #6b7280;
+        line-height: 1.4;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="badge">
+        <span>GoalShift</span>
+        <span>beta</span>
       </div>
-      <div class="prediction-meta" id="prediction-meta">
-        Güven skoru: %-- • Saat: --
+
+      <div class="logo">
+        GOAL<span>SHIFT</span>
       </div>
-    </div>
+      <p class="subtitle">
+        Günde tek maç. Tamamen istatistiğe ve canlı verilere dayalı tek tahmin.
+        Önce giriş yap, sonra “bugünün seçimi”ni burada göreceksin.
+      </p>
 
-    <button id="google-btn" class="btn-google">
-      <span class="icon">🔐</span>
-      <span>Google ile giriş yap</span>
-    </button>
+      <p class="section-title">Bugünün tahmini</p>
+      <p class="section-text">
+        İlk adımda sadece giriş altyapısını kuruyoruz. Google ile giriş yaptıktan
+        sonra seni otomatik olarak kayıt edeceğiz ve bir sonraki adımda tek maç
+        panelini buraya bağlayacağız.
+      </p>
 
-    <button id="logout-btn" class="btn-logout" style="display:none;">
-      Oturumu kapat
-    </button>
+      <button id="google-login-btn" class="btn">
+        <span class="btn-lock">🔒</span>
+        <span>Google ile giriş yap</span>
+      </button>
 
-    <div class="user-info" id="user-info" style="display:none;"></div>
+      <p id="status-text" class="status">
+        Durum: <span>Henüz giriş yapılmadı.</span>
+      </p>
 
-    <div class="divider"></div>
+      <p class="footnote">
+        Giriş yaptığında hesabın sadece GoalShift içindeki tahmin geçmişini
+        tutmak için kullanılacak. İstediğin zaman hesabını sildirebileceksin.
+      </p>
+    </main>
 
-    <div class="footer-note">
-      Şimdi sadece giriş altyapısını kuruyoruz. Sonraki adımda senin panelinden girilen
-      verilerle tahminleri buraya çekeceğiz.
-    </div>
-  </div>
+    <!-- Firebase bağlantısı -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+      import {
+        getAuth,
+        GoogleAuthProvider,
+        signInWithPopup,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        setDoc,
+      } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-  <script type="module">
-    // 1) Firebase SDK'ları (CDN üzerinden)
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getAuth,
-      GoogleAuthProvider,
-      signInWithPopup,
-      signOut,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+      // 🔴 BURAYI KENDİ FIREBASE CONFIG'İNLE DOLDUR
+      const firebaseConfig = {
+        apiKey: "AIzaSyB55Fzupjc0Ki2-FZiTlnyCziaD_Dy1DlI",
+        authDomain: "goalshift-app.firebaseapp.com",
+        projectId: "goalshift-app",
+        storageBucket: "goalshift-app.firebasestorage.app",
+        messagingSenderId: "10190573722",
+        appId: "1:10190573722:web:93ba014a4263ce1702cf23",
+      };
 
-    // 2) BURAYA KENDİ FIREBASE CONFIG'İNİ YAPIŞTIR
-    const firebaseConfig = {
-      apiKey: "AIzaSyB55Fzupjc0Ki2-FZiTlnyCziaD_Dy1DlI",
-      authDomain: "goalshift-app.firebaseapp.com",
-      projectId: "goalshift-app",
-      storageBucket: "goalshift-app.firebasestorage.app",
-      messagingSenderId: "10190573722",
-      appId: "1:10190573722:web:93ba014a4263ce1702cf23"
-    };
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const provider = new GoogleAuthProvider();
+      const db = getFirestore(app);
 
-    // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+      const loginBtn = document.getElementById("google-login-btn");
+      const statusText = document.getElementById("status-text");
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-
-    // 3) DOM referansları
-    const googleBtn = document.getElementById("google-btn");
-    const logoutBtn = document.getElementById("logout-btn");
-    const sessionStatus = document.getElementById("session-status");
-    const userInfo = document.getElementById("user-info");
-    const predictionBox = document.getElementById("prediction-box");
-    const predictionMain = document.getElementById("prediction-main");
-    const predictionMeta = document.getElementById("prediction-meta");
-    const predictionHelp = document.getElementById("prediction-help");
-
-    // 4) Login / Logout olayları
-    googleBtn.addEventListener("click", async () => {
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (err) {
-        console.error(err);
-        alert("Giriş sırasında bir hata oldu: " + err.message);
+      function setStatus(text) {
+        if (!statusText) return;
+        const span = statusText.querySelector("span");
+        if (span) span.textContent = text;
       }
-    });
 
-    logoutBtn.addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-      } catch (err) {
-        console.error(err);
-      }
-    });
+      loginBtn?.addEventListener("click", async () => {
+        try {
+          setStatus("Google penceresi açılıyor...");
+          const result = await signInWithPopup(auth, provider);
+          const user = result.user;
 
-    // 5) Kullanıcı durumunu dinle
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        sessionStatus.textContent = "Giriş yapıldı";
-        userInfo.style.display = "block";
-        userInfo.textContent = `Giriş yapan: ${user.email ?? user.displayName ?? "Bilinmiyor"}`;
+          // Kullanıcıyı Firestore'a kaydet / güncelle
+          await setDoc(
+            doc(db, "users", user.uid),
+            {
+              email: user.email,
+              name: user.displayName ?? "",
+              photoURL: user.photoURL ?? "",
+              lastLogin: new Date(),
+            },
+            { merge: true }
+          );
 
-        googleBtn.style.display = "none";
-        logoutBtn.style.display = "inline-flex";
+          setStatus(
+            `Hoş geldin ${
+              (user.displayName || "").split(" ")[0]
+            }! Tahmin ekranını bir sonraki adımda bağlayacağız.`
+          );
+        } catch (err) {
+          console.error(err);
+          setStatus("Girişte bir hata oluştu.");
+          alert("Girişte bir hata oluştu: " + err.message);
+        }
+      });
 
-        // Şimdilik tahmini biz sabit yazıyoruz.
-        // Sonraki adımda Firestore'dan "bugünün tahmini"ni çekeceğiz.
-        predictionBox.style.display = "block";
-        predictionHelp.textContent = "Bu demo tahmin. Panelden veri yazmayı eklediğimizde burası canlı olacak.";
-
-        predictionMain.textContent = "ÖRNEK: Galatasaray – Fenerbahçe • İlk Yarı Gol Var";
-        predictionMeta.textContent = "Güven skoru: %78 • Saat: 20:00";
-      } else {
-        sessionStatus.textContent = "Giriş yapmadın";
-
-        userInfo.style.display = "none";
-        googleBtn.style.display = "inline-flex";
-        logoutBtn.style.display = "none";
-        predictionBox.style.display = "none";
-        predictionHelp.textContent = "Önce Google ile giriş yap, sonra bugünün tek tahminini burada göreceksin.";
-      }
-    });
-  </script>
-</body>
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          loginBtn.querySelector("span:nth-child(2)").textContent =
+            "Google ile bağlısın";
+          setStatus(
+            `Şu anda ${user.email} ile giriş yapmış durumdasın. Çıkış için butona uzun basmayı kullanacağız (bir sonraki adımda).`
+          );
+        } else {
+          loginBtn.querySelector("span:nth-child(2)").textContent =
+            "Google ile giriş yap";
+          setStatus("Henüz giriş yapılmadı.");
+        }
+      });
+    </script>
+  </body>
 </html>
-
