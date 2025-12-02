@@ -154,88 +154,65 @@
     </main>
 
     <!-- Firebase bağlantısı -->
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-      import {
-        getAuth,
-        GoogleAuthProvider,
-        signInWithPopup,
-        onAuthStateChanged,
-        signOut,
-      } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-      import {
-        getFirestore,
-        doc,
-        setDoc,
-      } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+<script type="module">
+  // Firebase'i CDN'den import ediyoruz (tarayıcı için doğru yöntem)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import {
+    getAuth,
+    signInWithPopup,
+    GoogleAuthProvider,
+    onAuthStateChanged,
+  } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-      // 🔴 BURAYI KENDİ FIREBASE CONFIG'İNLE DOLDUR
-      const firebaseConfig = {
-        apiKey: "AIzaSyB55Fzupjc0Ki2-FZiTlnyCziaD_Dy1DlI",
-        authDomain: "goalshift-app.firebaseapp.com",
-        projectId: "goalshift-app",
-        storageBucket: "goalshift-app.firebasestorage.app",
-        messagingSenderId: "10190573722",
-        appId: "1:10190573722:web:93ba014a4263ce1702cf23",
-      };
+  // !!! BURAYA KENDİ PROJE BİLGİLERİNİ KOY !!!
+  // Firebase Project Settings > Web app config ekranında gördüğün değerler
+  const firebaseConfig = {
+    apiKey: "AZaSyB55Fzupjc0Ki2-FZiTlNyCziaD_Dy1DLl",   // örnek – sende ne yazıyorsa onu koy
+    authDomain: "goalshift-app.firebaseapp.com",
+    projectId: "goalshift-app",
+    storageBucket: "goalshift-app.appspot.com",
+    messagingSenderId: "10190573722",
+    appId: "1:10190573722:web:93ba014a4263ce1702cf23",
+  };
 
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const provider = new GoogleAuthProvider();
-      const db = getFirestore(app);
+  // Firebase başlat
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
 
-      const loginBtn = document.getElementById("google-login-btn");
-      const statusText = document.getElementById("status-text");
+  // DOM elemanlarını yakala
+  const googleBtn = document.getElementById("google-signin-btn");
 
-      function setStatus(text) {
-        if (!statusText) return;
-        const span = statusText.querySelector("span");
-        if (span) span.textContent = text;
+  // Butonun tıklama olayı
+  if (googleBtn) {
+    googleBtn.addEventListener("click", async () => {
+      console.log("Google ile giriş butonuna tıklandı");
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        console.log("Giriş başarılı:", user.email);
+
+        googleBtn.disabled = true;
+        googleBtn.innerText = "Giriş yaptın ✔";
+      } catch (err) {
+        console.error("Giriş hatası:", err);
+        alert("Giriş yapılırken bir hata oluştu: " + (err.code || err.message));
       }
+    });
+  }
 
-      loginBtn?.addEventListener("click", async () => {
-        try {
-          setStatus("Google penceresi açılıyor...");
-          const result = await signInWithPopup(auth, provider);
-          const user = result.user;
+  // Kullanıcı zaten giriş yaptıysa buton text'ini güncelle
+  onAuthStateChanged(auth, (user) => {
+    if (user && googleBtn) {
+      googleBtn.disabled = true;
+      googleBtn.innerText = "Giriş yaptın ✔";
+    } else if (googleBtn) {
+      googleBtn.disabled = false;
+      googleBtn.innerText = "Google ile giriş yap";
+    }
+  });
+</script>
 
-          // Kullanıcıyı Firestore'a kaydet / güncelle
-          await setDoc(
-            doc(db, "users", user.uid),
-            {
-              email: user.email,
-              name: user.displayName ?? "",
-              photoURL: user.photoURL ?? "",
-              lastLogin: new Date(),
-            },
-            { merge: true }
-          );
-
-          setStatus(
-            `Hoş geldin ${
-              (user.displayName || "").split(" ")[0]
-            }! Tahmin ekranını bir sonraki adımda bağlayacağız.`
-          );
-        } catch (err) {
-          console.error(err);
-          setStatus("Girişte bir hata oluştu.");
-          alert("Girişte bir hata oluştu: " + err.message);
-        }
-      });
-
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          loginBtn.querySelector("span:nth-child(2)").textContent =
-            "Google ile bağlısın";
-          setStatus(
-            `Şu anda ${user.email} ile giriş yapmış durumdasın. Çıkış için butona uzun basmayı kullanacağız (bir sonraki adımda).`
-          );
-        } else {
-          loginBtn.querySelector("span:nth-child(2)").textContent =
-            "Google ile giriş yap";
-          setStatus("Henüz giriş yapılmadı.");
-        }
-      });
-    </script>
   </body>
 </html>
