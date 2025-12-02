@@ -1,99 +1,147 @@
 // pages/index.tsx
+import Head from "next/head";
 import { useState } from "react";
 import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "../lib/firebase";
 
 export default function Home() {
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleSignIn = async () => {
     try {
       setError(null);
+      setLoading(true);
+      console.log("[Goalshift] Google sign-in starting...");
+
       const result = await signInWithPopup(auth, googleProvider);
-      setUserEmail(result.user.email ?? null);
+
+      console.log("[Goalshift] Signed in user:", result.user);
+      // Sonraki adımda: /dashboard gibi bir yere yönlendirebiliriz.
+      // Şimdilik sadece console'da dursun.
     } catch (err: any) {
-      console.error(err);
-      setError(err.code || err.message || "Bir hata oluştu");
+      console.error("[Goalshift] Google sign-in error:", err);
+      setError(err?.message || "Bir hata oluştu, lütfen tekrar dene.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "#020617",
-        color: "#e5e7eb",
-        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-      }}
-    >
-      <div
+    <>
+      <Head>
+        <title>Goalshift</title>
+      </Head>
+
+      <main
         style={{
-          padding: "24px 28px",
-          borderRadius: "16px",
-          border: "1px solid #1f2937",
-          background:
-            "radial-gradient(circle at top, rgba(56,189,248,0.13), transparent 60%) #020617",
-          width: "100%",
-          maxWidth: "420px",
-          boxShadow: "0 20px 45px rgba(15,23,42,0.7)",
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "radial-gradient(circle at top, #111827, #020617)",
+          color: "white",
+          fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
         }}
       >
-        <h1 style={{ fontSize: "24px", fontWeight: 600, marginBottom: "8px" }}>
-          GoalShift
-        </h1>
-        <p style={{ fontSize: "14px", color: "#9ca3af", marginBottom: "20px" }}>
-          Google ile giriş yap, yakında günlük tek maçlık istatistik paneline
-          buradan ulaşacaksın.
-        </p>
-
-        <button
-          onClick={handleGoogleLogin}
+        <div
           style={{
             width: "100%",
-            padding: "10px 14px",
-            borderRadius: "999px",
-            border: "1px solid #4b5563",
-            background:
-              "linear-gradient(to right, #22c55e, #22d3ee, #6366f1)",
-            color: "#020617",
-            fontWeight: 600,
-            fontSize: "14px",
-            cursor: "pointer",
+            maxWidth: 480,
+            padding: "32px 28px",
+            borderRadius: 24,
+            background: "rgba(15, 23, 42, 0.9)",
+            border: "1px solid rgba(148, 163, 184, 0.3)",
+            boxShadow:
+              "0 20px 40px rgba(15, 23, 42, 0.8), 0 0 0 1px rgba(15, 23, 42, 0.9)",
           }}
         >
-          Google ile giriş yap
-        </button>
+          <div style={{ marginBottom: 24 }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                padding: "4px 10px",
+                borderRadius: 999,
+                background: "rgba(34, 197, 94, 0.12)",
+                color: "#4ade80",
+                fontSize: 12,
+                marginBottom: 10,
+              }}
+            >
+              <span
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "999px",
+                  background: "#22c55e",
+                  marginRight: 6,
+                }}
+              />
+              Günlük tek maç · İstatistiğe dayalı tahmin
+            </div>
 
-        {userEmail && (
-          <p
+            <h1
+              style={{
+                fontSize: 28,
+                fontWeight: 700,
+                letterSpacing: 0.04,
+                marginBottom: 8,
+              }}
+            >
+              GOALSHİFT
+            </h1>
+
+            <p
+              style={{
+                fontSize: 14,
+                color: "#9ca3af",
+                lineHeight: 1.6,
+              }}
+            >
+              Önce Google ile giriş yap, sonra bugünün tek tahminini burada
+              göreceksin. Şimdilik sadece giriş altyapısını kuruyoruz.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={loading}
             style={{
-              marginTop: "16px",
-              fontSize: "13px",
-              color: "#a5b4fc",
-              wordBreak: "break-all",
+              width: "100%",
+              padding: "12px 16px",
+              borderRadius: 999,
+              border: "none",
+              outline: "none",
+              cursor: loading ? "default" : "pointer",
+              background: loading ? "rgba(148,163,184,0.3)" : "#22c55e",
+              color: "#020617",
+              fontWeight: 600,
+              fontSize: 15,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              transition: "background 0.15s ease, transform 0.1s ease",
             }}
           >
-            Giriş yaptın: {userEmail}
-          </p>
-        )}
+            {loading ? "Giriş yapılıyor..." : "Google ile giriş yap"}
+          </button>
 
-        {error && (
-          <p
-            style={{
-              marginTop: "16px",
-              fontSize: "13px",
-              color: "#fca5a5",
-              wordBreak: "break-all",
-            }}
-          >
-            Hata: {error}
-          </p>
-        )}
-      </div>
-    </main>
+          {error && (
+            <p
+              style={{
+                marginTop: 12,
+                fontSize: 13,
+                color: "#fca5a5",
+              }}
+            >
+              {error}
+            </p>
+          )}
+        </div>
+      </main>
+    </>
   );
 }
