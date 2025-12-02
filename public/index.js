@@ -1,58 +1,55 @@
-// Firebase SDK'yı CDN'den alıyoruz (v10 modular)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+// Firebase SDK'yı CDN'den modüler şekilde yüklüyoruz
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
 import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
-  onAuthStateChanged,
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
-// 🔐 Firebase config – senin panelindeki değerlerle birebir aynı olmalı
+// 🔐 Senin proje ayarların (Firebase ekranındaki ile aynı)
 const firebaseConfig = {
-  apiKey: "AZaSyB5SFzupjc0Ki2-FZiTlnyCziaD_Dy1DL1",        // sende ne yazıyorsa
+  apiKey: "AIzaSyB55Fzupjc0Ki2-FZiLTnyCziaD_Dy1DLI",
   authDomain: "goalshift-app.firebaseapp.com",
   projectId: "goalshift-app",
-  storageBucket: "goalshift-app.appspot.com",
+  storageBucket: "goalshift-app.firebasestorage.app",
   messagingSenderId: "10190573722",
-  appId: "1:10190573722:web:93ba014a4263ce1702cf23",
+  appId: "1:10190573722:web:93ba014a2463ce1702cf23",
 };
 
-// 🔧 Firebase'i başlat
+// ❗ Burada SADECE 1 kere initialize ediyoruz
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// 🧠 DOM elementlerini yakala
-const loginButton = document.getElementById("google-login-btn");
+// Butonu bul
+const googleBtn = document.getElementById("googleSignInBtn");
 
-// Kullanıcı login olduysa burada yakalayacağız (ileride panel vs. için lazım)
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log("Giriş yapan:", user.email || user.uid);
-    // İleride: burada "Bugünün tahmini" ekranına geçebiliriz
-  } else {
-    console.log("Henüz giriş yok");
-  }
-});
+if (googleBtn) {
+  googleBtn.addEventListener("click", async () => {
+    try {
+      googleBtn.disabled = true;
+      googleBtn.style.opacity = "0.7";
+      googleBtn.textContent = "Giriş yapılıyor...";
 
-// 🔑 Google ile giriş fonksiyonu
-async function handleGoogleLogin() {
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
+      const result = await signInWithPopup(auth, provider);
 
-    console.log("Giriş başarılı:", user.email || user.uid);
-    alert("Giriş başarılı: " + (user.email || user.displayName || "Kullanıcı"));
-    // TODO: burada Firestore'a kayıt, panel, vs.
-  } catch (error) {
-    console.error("Giriş hatası:", error);
-    alert("Giriş sırasında hata oluştu: " + (error.code || error.message));
-  }
-}
+      console.log("Giriş başarılı:", result.user.email);
 
-// Butona tıklanınca popup'ı aç
-if (loginButton) {
-  loginButton.addEventListener("click", handleGoogleLogin);
+      // Şimdilik sadece küçük bir mesaj gösterelim
+      alert("Giriş başarılı: " + (result.user.email || "Google hesabı"));
+
+      googleBtn.disabled = false;
+      googleBtn.style.opacity = "1";
+      googleBtn.textContent = "Google ile giriş yap";
+    } catch (error) {
+      console.error("Google ile giriş hatası:", error);
+      alert("Giriş sırasında bir hata oluştu. Konsolu kontrol et (F12).");
+
+      googleBtn.disabled = false;
+      googleBtn.style.opacity = "1";
+      googleBtn.textContent = "Google ile giriş yap";
+    }
+  });
 } else {
-  console.error("google-login-btn ID'li buton bulunamadı!");
+  console.error("googleSignInBtn butonu bulunamadı!");
 }
