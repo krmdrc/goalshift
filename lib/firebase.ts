@@ -2,15 +2,19 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
+// Firebase web config'in (Firebase Project settings → Web app’ten aldığın)
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
+  apiKey: "AIzaSyB5F5zupjc0Ki2-FZiTlnyCziaD_Dy1DL1",
+  authDomain: "goalshift-app.firebaseapp.com",
+  projectId: "goalshift-app",
+  storageBucket: "goalshift-app.firebasestorage.app",
+  messagingSenderId: "10190573722",
+  appId: "1:10190573722:web:93ba014a4263ce1702cf23",
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+
+export { app, auth, googleProvider };
