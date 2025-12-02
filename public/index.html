@@ -155,64 +155,57 @@
 
     <!-- Firebase bağlantısı -->
 <script type="module">
-  // Firebase'i CDN'den import ediyoruz (tarayıcı için doğru yöntem)
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
   import {
     getAuth,
-    signInWithPopup,
     GoogleAuthProvider,
+    signInWithPopup,
     onAuthStateChanged,
-  } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
-  // !!! BURAYA KENDİ PROJE BİLGİLERİNİ KOY !!!
-  // Firebase Project Settings > Web app config ekranında gördüğün değerler
+  // -- SADECE BİR TANE firebaseConfig ve app TANIMI VAR! --
   const firebaseConfig = {
-    apiKey: "AZaSyB55Fzupjc0Ki2-FZiTlNyCziaD_Dy1DLl",   // örnek – sende ne yazıyorsa onu koy
+    apiKey: "AIzaSyB55Fzupjc0Ki2-FZiTLnyCziaD_Dy1DLl",
     authDomain: "goalshift-app.firebaseapp.com",
     projectId: "goalshift-app",
-    storageBucket: "goalshift-app.appspot.com",
+    storageBucket: "goalshift-app.firebasestorage.app",
     messagingSenderId: "10190573722",
-    appId: "1:10190573722:web:93ba014a4263ce1702cf23",
+    appId: "1:10190573722:web:93ba014a4263ce1702cf23"
   };
 
-  // Firebase başlat
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: "select_account" });
 
-  // DOM elemanlarını yakala
-  const googleBtn = document.getElementById("google-signin-btn");
+  const googleBtn = document.getElementById("google-login-btn");
+  const statusText = document.getElementById("login-status"); // kartın altındaki yazı için
 
-  // Butonun tıklama olayı
   if (googleBtn) {
     googleBtn.addEventListener("click", async () => {
-      console.log("Google ile giriş butonuna tıklandı");
       try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        console.log("Giriş başarılı:", user.email);
 
-        googleBtn.disabled = true;
-        googleBtn.innerText = "Giriş yaptın ✔";
-      } catch (err) {
-        console.error("Giriş hatası:", err);
-        alert("Giriş yapılırken bir hata oluştu: " + (err.code || err.message));
+        if (statusText) {
+          statusText.textContent =
+            (user.displayName || user.email || "Giriş başarılı") +
+            " – artık her gün tek maç tahminini görebileceksin.";
+        }
+      } catch (error) {
+        console.error("Google login error:", error);
+        alert("Google ile giriş sırasında bir hata oluştu: " + error.message);
       }
     });
   }
 
-  // Kullanıcı zaten giriş yaptıysa buton text'ini güncelle
   onAuthStateChanged(auth, (user) => {
-    if (user && googleBtn) {
-      googleBtn.disabled = true;
-      googleBtn.innerText = "Giriş yaptın ✔";
-    } else if (googleBtn) {
-      googleBtn.disabled = false;
-      googleBtn.innerText = "Google ile giriş yap";
+    if (user && statusText) {
+      statusText.textContent =
+        (user.displayName || user.email || "Hoş geldin") +
+        " – giriş yapıldı.";
     }
   });
 </script>
 
-  </body>
 </html>
