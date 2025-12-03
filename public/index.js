@@ -10,10 +10,10 @@ import {
 // const firebaseConfig = { ... } şeklinde
 const firebaseConfig = {
   // ÖRNEK (bunu kendi projendekilerle değiştir):
-  apiKey: "SENİN_API_KEY",
-  authDomain: "SENIN_PROJEN.firebaseapp.com",
-  projectId: "SENIN_PROJEN",
-  appId: "SENIN_APP_ID",
+  apiKey: "AIzaSyB55Fzupjc0Ki2-FZiTlnyCziaD_Dy1DlI",
+  authDomain: "goalshift-app.firebaseapp.com",
+  projectId: "goalshift-app",
+  appId: "1:10190573722:web:93ba014a4263ce1702cf23",
 };
 
 const app = initializeApp(firebaseConfig); // <-- SADECE BURADA TANIMLI
